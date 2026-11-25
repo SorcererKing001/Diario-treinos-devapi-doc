@@ -3,10 +3,7 @@ info:
   title: Diário de Treinos API
   version: 1.0.0
   description: |
-    API REST para gerenciar treinos de academia com exercícios embutidos (MongoDB).
-
-    **Modelagem:** cada treino é um documento com um array de exercícios (subdocumentos com `_id` próprio).
-    Isso permite manipular exercícios individualmente com operadores do MongoDB (`$push`, `$pull`, `arrayFilters`).
+    API REST para gerenciamento de treinos de academia, utilizando MongoDB como banco de dados de documentos.
 
     **Funcionalidades:**
     - CRUD completo de treinos
@@ -14,9 +11,8 @@ info:
     - Paginação
     - Subrotas para adicionar, atualizar e remover exercícios individualmente
     - Agregação de volume total por grupo muscular
-  contact:
-    name: João
-    url: https://github.com/sorcererking001
+    
+    Para testar, selecione um endpoint abaixo, clique em "Try it out", preencha os parâmetros e clique em "Execute".
 servers:
   - url: https://diario-treinos-devapi.vercel.app/api
     description: Produção (Vercel)
@@ -24,19 +20,19 @@ servers:
     description: Local
 
 tags:
-  - name: Workouts
+  - name: Treinos
     description: Operações de CRUD dos treinos
-  - name: Exercises
+  - name: Exercícios
     description: Manipulação dos exercícios embutidos em cada treino
-  - name: Stats
+  - name: Estatísticas
     description: Estatísticas e agregações
 
 paths:
   /workouts:
     post:
-      tags: [Workouts]
+      tags: [Treinos]
       summary: Cria um treino
-      description: Cria um novo treino com um array de exercícios embutidos. Cada exercício recebe um `_id` próprio.
+      description: Cria um novo treino com um array de exercícios embutidos. Cada exercício recebe um ID próprio.
       requestBody:
         required: true
         content:
@@ -71,7 +67,7 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequest'
     get:
-      tags: [Workouts]
+      tags: [Treinos]
       summary: Lista treinos com filtros e paginação
       description: Retorna uma lista paginada de treinos. Aceita filtros por grupo muscular e intervalo de datas.
       parameters:
@@ -121,7 +117,7 @@ paths:
         description: ID do treino
         schema: { type: string }
     get:
-      tags: [Workouts]
+      tags: [Treinos]
       summary: Busca treino por ID
       responses:
         '200':
@@ -133,7 +129,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     put:
-      tags: [Workouts]
+      tags: [Treinos]
       summary: Substitui o treino inteiro
       requestBody:
         required: true
@@ -153,9 +149,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     patch:
-      tags: [Workouts]
+      tags: [Treinos]
       summary: Atualização parcial
-      description: "Atualiza apenas os campos enviados (ex.: `notes`, `title`, `durationMinutes`)."
+      description: "Atualiza apenas os campos enviados (ex: notes, title, durationMinutes)."
       requestBody:
         required: true
         content:
@@ -178,7 +174,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     delete:
-      tags: [Workouts]
+      tags: [Treinos]
       summary: Remove treino
       responses:
         '204':
@@ -193,9 +189,9 @@ paths:
         required: true
         schema: { type: string }
     post:
-      tags: [Exercises]
+      tags: [Exercícios]
       summary: Adiciona exercício ao treino
-      description: Usa o operador `$push` para adicionar um novo exercício ao array.
+      description: Adiciona um novo exercício ao array do treino.
       requestBody:
         required: true
         content:
@@ -230,9 +226,9 @@ paths:
         required: true
         schema: { type: string }
     patch:
-      tags: [Exercises]
+      tags: [Exercícios]
       summary: Atualiza um exercício específico
-      description: Usa `arrayFilters` para atualizar apenas o exercício com o `_id` informado.
+      description: Atualiza apenas o exercício com o ID informado dentro do treino.
       requestBody:
         required: true
         content:
@@ -256,9 +252,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
     delete:
-      tags: [Exercises]
+      tags: [Exercícios]
       summary: Remove exercício do treino
-      description: Usa o operador `$pull` para remover o exercício do array.
+      description: Remove o exercício do array do treino.
       responses:
         '204':
           description: Exercício removido
@@ -267,12 +263,12 @@ paths:
 
   /workouts/stats:
     get:
-      tags: [Stats]
+      tags: [Estatísticas]
       summary: Volume total por grupo muscular
       description: |
-        Usa aggregation pipeline do MongoDB (`$unwind` + `$group`) para calcular:
-        - `totalVolumeKg`: soma de `sets × reps × weightKg` por grupo muscular
-        - `totalSets`: soma das séries por grupo muscular
+        Calcula o volume total de treino por grupo muscular.
+        - Total de Volume (kg): séries x repetições x carga
+        - Total de Séries: soma das séries por grupo
       parameters:
         - in: query
           name: from
@@ -290,9 +286,9 @@ paths:
                 items:
                   type: object
                   properties:
-                    muscleGroup: { type: string }
-                    totalVolumeKg: { type: number }
-                    totalSets: { type: integer }
+                    muscleGroup: { type: string, example: Peito }
+                    totalVolumeKg: { type: number, example: 1600 }
+                    totalSets: { type: integer, example: 4 }
 
 components:
   schemas:
