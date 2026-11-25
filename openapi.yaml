@@ -12,7 +12,6 @@ info:
     - Subrotas para adicionar, atualizar e remover exercícios individualmente
     - Agregação de volume total por grupo muscular
     
-    Para testar, selecione um endpoint abaixo, clique em "Try it out", preencha os parâmetros e clique em "Execute".
 servers:
   - url: https://diario-treinos-devapi.vercel.app/api
     description: Produção (Vercel)
