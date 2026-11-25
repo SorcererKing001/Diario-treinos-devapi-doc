@@ -1,0 +1,48 @@
+.swagger-ui .topbar {
+    display: none;
+}
+
+body {
+    background-color: #f4f6f8;
+}
+
+.swagger-ui .info .title {
+    color: #2c3e50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.swagger-ui .opblock-tag {
+    color: #34495e;
+    font-size: 1.2em;
+    border-bottom: 2px solid #3498db;
+}
+
+.swagger-ui .btn.execute {
+    background-color: #3498db;
+    border-color: #2980b9;
+    color: #fff;
+}
+
+.swagger-ui .btn.execute:hover {
+    background-color: #2980b9;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+    background: #61affe;
+}
+
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+    background: #49cc90;
+}
+
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+    background: #fca130;
+}
+
+.swagger-ui .opblock.opblock-patch .opblock-summary-method {
+    background: #50e3c2;
+}
+
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+    background: #f93e3e;
+}
