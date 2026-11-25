@@ -2,22 +2,41 @@ openapi: 3.0.3
 info:
   title: Diário de Treinos API
   version: 1.0.0
-  description: API REST para gerenciar treinos de academia com exercícios embutidos (MongoDB).
+  description: |
+    API REST para gerenciar treinos de academia com exercícios embutidos (MongoDB).
+
+    **Modelagem:** cada treino é um documento com um array de exercícios (subdocumentos com `_id` próprio).
+    Isso permite manipular exercícios individualmente com operadores do MongoDB (`$push`, `$pull`, `arrayFilters`).
+
+    **Funcionalidades:**
+    - CRUD completo de treinos
+    - Filtros por grupo muscular e intervalo de datas
+    - Paginação
+    - Subrotas para adicionar, atualizar e remover exercícios individualmente
+    - Agregação de volume total por grupo muscular
+  contact:
+    name: João
+    url: https://github.com/sorcererking001
 servers:
   - url: https://diario-treinos-devapi.vercel.app/api
     description: Produção (Vercel)
   - url: http://localhost:3000/api
     description: Local
+
 tags:
   - name: Workouts
+    description: Operações de CRUD dos treinos
   - name: Exercises
+    description: Manipulação dos exercícios embutidos em cada treino
   - name: Stats
+    description: Estatísticas e agregações
 
 paths:
   /workouts:
     post:
       tags: [Workouts]
       summary: Cria um treino
+      description: Cria um novo treino com um array de exercícios embutidos. Cada exercício recebe um `_id` próprio.
       requestBody:
         required: true
         content:
@@ -44,7 +63,7 @@ paths:
                   weightKg: 100
       responses:
         '201':
-          description: Criado
+          description: Treino criado com sucesso
           content:
             application/json:
               schema:
@@ -54,35 +73,41 @@ paths:
     get:
       tags: [Workouts]
       summary: Lista treinos com filtros e paginação
+      description: Retorna uma lista paginada de treinos. Aceita filtros por grupo muscular e intervalo de datas.
       parameters:
         - in: query
           name: muscleGroup
+          description: Filtra treinos que contenham ao menos um exercício do grupo muscular informado
           schema:
             type: string
             enum: [Peito, Costas, Pernas, Ombros, Bíceps, Tríceps, Abdômen, Cardio]
         - in: query
           name: from
+          description: Data inicial (formato ISO)
           schema: { type: string, format: date }
         - in: query
           name: to
+          description: Data final (formato ISO)
           schema: { type: string, format: date }
         - in: query
           name: page
+          description: Número da página
           schema: { type: integer, default: 1 }
         - in: query
           name: limit
+          description: Quantidade de itens por página
           schema: { type: integer, default: 10 }
       responses:
         '200':
-          description: Lista paginada
+          description: Lista paginada de treinos
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  total: { type: integer }
-                  page: { type: integer }
-                  limit: { type: integer }
+                  total: { type: integer, example: 2 }
+                  page: { type: integer, example: 1 }
+                  limit: { type: integer, example: 10 }
                   data:
                     type: array
                     items:
@@ -93,13 +118,14 @@ paths:
       - in: path
         name: id
         required: true
+        description: ID do treino
         schema: { type: string }
     get:
       tags: [Workouts]
       summary: Busca treino por ID
       responses:
         '200':
-          description: Encontrado
+          description: Treino encontrado
           content:
             application/json:
               schema:
@@ -117,7 +143,7 @@ paths:
               $ref: '#/components/schemas/WorkoutInput'
       responses:
         '200':
-          description: Atualizado
+          description: Treino atualizado
           content:
             application/json:
               schema:
@@ -129,6 +155,7 @@ paths:
     patch:
       tags: [Workouts]
       summary: Atualização parcial
+      description: Atualiza apenas os campos enviados (ex.: `notes`, `title`, `durationMinutes`).
       requestBody:
         required: true
         content:
@@ -139,9 +166,11 @@ paths:
                 title: { type: string }
                 notes: { type: string }
                 durationMinutes: { type: integer }
+            example:
+              notes: Subi a carga do supino para 45kg
       responses:
         '200':
-          description: Atualizado
+          description: Treino atualizado
           content:
             application/json:
               schema:
@@ -153,7 +182,7 @@ paths:
       summary: Remove treino
       responses:
         '204':
-          description: Removido
+          description: Treino removido
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -165,7 +194,8 @@ paths:
         schema: { type: string }
     post:
       tags: [Exercises]
-      summary: Adiciona exercício ao treino ($push)
+      summary: Adiciona exercício ao treino
+      description: Usa o operador `$push` para adicionar um novo exercício ao array.
       requestBody:
         required: true
         content:
@@ -181,7 +211,7 @@ paths:
               weightKg: 40
       responses:
         '201':
-          description: Adicionado
+          description: Exercício adicionado
           content:
             application/json:
               schema:
@@ -201,7 +231,8 @@ paths:
         schema: { type: string }
     patch:
       tags: [Exercises]
-      summary: Atualiza um exercício específico (arrayFilters)
+      summary: Atualiza um exercício específico
+      description: Usa `arrayFilters` para atualizar apenas o exercício com o `_id` informado.
       requestBody:
         required: true
         content:
@@ -217,7 +248,7 @@ paths:
               reps: 12
       responses:
         '200':
-          description: Atualizado
+          description: Exercício atualizado
           content:
             application/json:
               schema:
@@ -226,17 +257,22 @@ paths:
           $ref: '#/components/responses/NotFound'
     delete:
       tags: [Exercises]
-      summary: Remove exercício do treino ($pull)
+      summary: Remove exercício do treino
+      description: Usa o operador `$pull` para remover o exercício do array.
       responses:
         '204':
-          description: Removido
+          description: Exercício removido
         '404':
           $ref: '#/components/responses/NotFound'
 
   /workouts/stats:
     get:
       tags: [Stats]
-      summary: Volume total por grupo muscular no período
+      summary: Volume total por grupo muscular
+      description: |
+        Usa aggregation pipeline do MongoDB (`$unwind` + `$group`) para calcular:
+        - `totalVolumeKg`: soma de `sets × reps × weightKg` por grupo muscular
+        - `totalSets`: soma das séries por grupo muscular
       parameters:
         - in: query
           name: from
@@ -246,7 +282,7 @@ paths:
           schema: { type: string, format: date }
       responses:
         '200':
-          description: Agregação
+          description: Resultado da agregação
           content:
             application/json:
               schema:
@@ -264,14 +300,14 @@ components:
       type: object
       required: [name, muscleGroup, sets, reps]
       properties:
-        name: { type: string }
+        name: { type: string, example: Supino Reto }
         muscleGroup:
           type: string
           enum: [Peito, Costas, Pernas, Ombros, Bíceps, Tríceps, Abdômen, Cardio]
-        equipment: { type: string }
-        sets: { type: integer, minimum: 1 }
-        reps: { type: integer, minimum: 1 }
-        weightKg: { type: number, minimum: 0 }
+        equipment: { type: string, example: Barra }
+        sets: { type: integer, minimum: 1, example: 4 }
+        reps: { type: integer, minimum: 1, example: 10 }
+        weightKg: { type: number, minimum: 0, example: 40 }
     Exercise:
       allOf:
         - $ref: '#/components/schemas/ExerciseInput'
@@ -282,10 +318,10 @@ components:
       type: object
       required: [title, date, exercises]
       properties:
-        title: { type: string }
-        date: { type: string, format: date-time }
-        durationMinutes: { type: integer, minimum: 1 }
-        notes: { type: string }
+        title: { type: string, example: Treino de Peito e Tríceps }
+        date: { type: string, format: date-time, example: "2026-11-20T10:00:00.000Z" }
+        durationMinutes: { type: integer, minimum: 1, example: 60 }
+        notes: { type: string, example: Aumentei a carga no supino }
         exercises:
           type: array
           minItems: 1
@@ -311,15 +347,15 @@ components:
           schema:
             type: object
             properties:
-              message: { type: string }
+              message: { type: string, example: Dados inválidos }
               errors:
                 type: array
                 items: { type: string }
     NotFound:
-      description: Não encontrado
+      description: Recurso não encontrado
       content:
         application/json:
           schema:
             type: object
             properties:
-              message: { type: string }
+              message: { type: string, example: Treino não encontrado }
