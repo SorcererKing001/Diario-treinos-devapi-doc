@@ -13,7 +13,9 @@ window.onload = function() {
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
     ],
-    layout: "StandaloneLayout"
+    layout: "StandaloneLayout",
+    customSiteTitle: "Diário de Treinos",
+    topbar: false
   });
 
   //</editor-fold>
