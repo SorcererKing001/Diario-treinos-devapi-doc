@@ -12,5 +12,48 @@ html {
 
 body {
     margin: 0;
-    background: #fafafa;
+    background: #f4f6f8 !important;
+}
+
+.swagger-ui .topbar {
+    display: none !important;
+}
+
+.swagger-ui .info .title {
+    color: #2c3e50 !important;
+}
+
+.swagger-ui .opblock-tag {
+    color: #34495e !important;
+    border-bottom: 2px solid #3498db !important;
+}
+
+.swagger-ui .btn.execute {
+    background-color: #3498db !important;
+    border-color: #2980b9 !important;
+    color: #fff !important;
+}
+
+.swagger-ui .btn.execute:hover {
+    background-color: #2980b9 !important;
+}
+
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+    background: #61affe !important;
+}
+
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+    background: #49cc90 !important;
+}
+
+.swagger-ui .opblock.opblock-put .opblock-summary-method {
+    background: #fca130 !important;
+}
+
+.swagger-ui .opblock.opblock-patch .opblock-summary-method {
+    background: #50e3c2 !important;
+}
+
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+    background: #f93e3e !important;
 }
