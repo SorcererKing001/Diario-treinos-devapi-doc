@@ -155,7 +155,7 @@ paths:
     patch:
       tags: [Workouts]
       summary: Atualização parcial
-      description: Atualiza apenas os campos enviados (ex.: `notes`, `title`, `durationMinutes`).
+      description: "Atualiza apenas os campos enviados (ex.: `notes`, `title`, `durationMinutes`)."
       requestBody:
         required: true
         content:
